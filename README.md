@@ -6,3 +6,4 @@ dependencies:
 - jpa
 - lombok
 - security
+- h2

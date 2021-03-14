@@ -6,15 +6,17 @@ import com.example.security.models.User;
 import com.example.security.repositories.AuthorityRepository;
 import com.example.security.repositories.MessageRepository;
 import com.example.security.repositories.UserRepository;
-import lombok.extern.log4j.Log4j;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
-
-import static java.rmi.server.LogStream.log;
 
 @Transactional
 @Component
@@ -24,11 +26,20 @@ public class Runner implements ApplicationRunner {
     private final UserRepository userRepository;
     private final AuthorityRepository authorityRepository;
     private final MessageRepository messageRepository;
+    private final UserDetailsService userDetailsService;
 
-    public Runner(UserRepository userRepository, AuthorityRepository authorityRepository, MessageRepository messageRepository) {
+    public Runner(UserRepository userRepository, AuthorityRepository authorityRepository, MessageRepository messageRepository, UserDetailsService userDetailsService) {
         this.userRepository = userRepository;
         this.authorityRepository = authorityRepository;
         this.messageRepository = messageRepository;
+        this.userDetailsService = userDetailsService;
+    }
+
+    private void authenticate(String cpf) {
+        UserDetails userDetails = this.userDetailsService.loadUserByUsername(cpf);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails,
+                userDetails.getPassword(), userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     @Override
@@ -46,5 +57,6 @@ public class Runner implements ApplicationRunner {
         log.info("maria: " + maria.toString());
         log.info("joao " + joao.toString());
 
+        authenticate(joao.getCpf());
     }
 }
