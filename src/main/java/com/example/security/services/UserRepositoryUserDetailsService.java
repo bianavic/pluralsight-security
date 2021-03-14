@@ -31,7 +31,7 @@ public class UserRepositoryUserDetailsService implements UserDetailsService {
             this.user = user;
             this.authorities = this.user.getAuthorities()
                     .stream()
-                    .map(authority -> new SimpleGrantedAuthority(authority.getAuthority()))
+                    .map(authority -> new SimpleGrantedAuthority("ROLE_" + authority.getAuthority()))
                     .collect(Collectors.toSet());
         }
 

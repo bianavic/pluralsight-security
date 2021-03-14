@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
+import java.util.function.Function;
 
 @Transactional
 @Component
@@ -49,14 +50,29 @@ public class Runner implements ApplicationRunner {
         Authority user = this.authorityRepository.save(new Authority("USER")),
                 admin = this.authorityRepository.save(new Authority("ADMIN"));
 
-        User maria = this.userRepository.save(new User("11111111111","maria@maria.com", "passowrd", admin, user));
+        User maria = this.userRepository.save(new User("11111111111","maria@maria.com", "password", admin, user));
         Message messageForMaria = this.messageRepository.save(new Message("hi Maria!", maria));
 
-        User joao = this.userRepository.save(new User("22222222222","joao@joao.com", "passowrd", user));
+        User joao = this.userRepository.save(new User("22222222222","joao@joao.com", "password", user));
+        Message messageForJoao = this.messageRepository.save(new Message("hi Joao!", joao));
 
         log.info("maria: " + maria.toString());
-        log.info("joao " + joao.toString());
+        log.info("joao: " + joao.toString());
+    }
 
-        authenticate(joao.getCpf());
+    private void attemptAccess(String adminUser,
+                               String regularUser,
+                               Long msgId,
+                               Function<Long, Message> fn) {
+        authenticate(adminUser);
+        log.info("result for maria:" + fn.apply(msgId));
+
+        try {
+            authenticate(regularUser);
+            log.info("result for joao:" + fn.apply(msgId));
+        } catch (Throwable ex) {
+            log.error("oops! couldn't obtain the result for Joao");
+        }
+
     }
 }
