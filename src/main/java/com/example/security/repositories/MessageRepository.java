@@ -3,6 +3,8 @@ package com.example.security.repositories;
 import com.example.security.models.Message;
 import com.example.security.models.User;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.security.access.annotation.Secured;
@@ -32,6 +34,8 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     @PostAuthorize("@authz.check(returnObject, principal?.user)")
     Message findByIdPostAuthorize(Long id);
 
+    @Query("select m from Message m where m.to.id = ?#{ principal?.user.id }")
+    Page<Message> findMessagesFor(Pageable pageable);
 }
 
 @Log4j2

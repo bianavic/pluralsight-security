@@ -9,6 +9,7 @@ import com.example.security.repositories.UserRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -50,22 +51,34 @@ public class Runner implements ApplicationRunner {
         Authority user = this.authorityRepository.save(new Authority("USER")),
                 admin = this.authorityRepository.save(new Authority("ADMIN"));
 
+        User joao = this.userRepository.save(new User("22222222222","joao@joao.com", "password", user));
         User maria = this.userRepository.save(new User("11111111111","maria@maria.com", "password", admin, user));
         Message messageForMaria = this.messageRepository.save(new Message("hi Maria!", maria));
+        this.messageRepository.save(new Message("Hi one", maria));
+        this.messageRepository.save(new Message("Hi two", maria));
 
-        User joao = this.userRepository.save(new User("22222222222","joao@joao.com", "password", user));
-        Message messageForJoao = this.messageRepository.save(new Message("hi Joao!", joao));
+        this.messageRepository.save(new Message("Hi three", joao));
+
+        // Message messageForJoao = this.messageRepository.save(new Message("hi Joao!", joao));
 
         log.info("maria: " + maria.toString());
         log.info("joao: " + joao.toString());
 
-        attemptAccess(maria.getCpf(), joao.getCpf(), messageForJoao.getId(), this.messageRepository::findByIdRolesAllowed);
+        attemptAccess(maria.getCpf(), joao.getCpf(), messageForMaria.getId(), this.messageRepository::findByIdRolesAllowed);
 
-        attemptAccess(maria.getCpf(), joao.getCpf(), messageForJoao.getId(), this.messageRepository::findByIdSecured);
+        attemptAccess(maria.getCpf(), joao.getCpf(), messageForMaria.getId(), this.messageRepository::findByIdSecured);
 
-        attemptAccess(maria.getCpf(), joao.getCpf(), messageForJoao.getId(), this.messageRepository::findByIdPreAuthorize);
+        attemptAccess(maria.getCpf(), joao.getCpf(), messageForMaria.getId(), this.messageRepository::findByIdPreAuthorize);
 
-        // attemptAccess(maria.getCpf(), joao.getCpf(), messageForJoao.getId(), this.messageRepository::findByIdPostAuthorize);
+        attemptAccess(maria.getCpf(), joao.getCpf(), messageForMaria.getId(), this.messageRepository::findByIdPostAuthorize);
+
+        authenticate(maria.getCpf());
+        this.messageRepository.findMessagesFor(PageRequest.of(0, 5))
+                .forEach(log::info);
+
+        authenticate(joao.getCpf());
+        this.messageRepository.findMessagesFor(PageRequest.of(0, 5))
+                .forEach(log::info);
     }
 
     private void attemptAccess(String adminUser,
