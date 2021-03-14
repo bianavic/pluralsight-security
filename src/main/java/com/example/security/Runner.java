@@ -79,6 +79,8 @@ public class Runner implements ApplicationRunner {
         authenticate(joao.getCpf());
         this.messageRepository.findMessagesFor(PageRequest.of(0, 5))
                 .forEach(log::info);
+
+        log.info("audited: " + this.messageRepository.save(new Message("This is a test", maria)));
     }
 
     private void attemptAccess(String adminUser,
