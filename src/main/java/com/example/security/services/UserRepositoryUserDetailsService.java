@@ -35,6 +35,10 @@ public class UserRepositoryUserDetailsService implements UserDetailsService {
                     .collect(Collectors.toSet());
         }
 
+        public User getUser() {
+            return user;
+        }
+
         @Override
         public Collection<? extends GrantedAuthority> getAuthorities() {
             return this.authorities;

@@ -62,6 +62,10 @@ public class Runner implements ApplicationRunner {
         attemptAccess(maria.getCpf(), joao.getCpf(), messageForJoao.getId(), this.messageRepository::findByIdRolesAllowed);
 
         attemptAccess(maria.getCpf(), joao.getCpf(), messageForJoao.getId(), this.messageRepository::findByIdSecured);
+
+        attemptAccess(maria.getCpf(), joao.getCpf(), messageForJoao.getId(), this.messageRepository::findByIdPreAuthorize);
+
+        // attemptAccess(maria.getCpf(), joao.getCpf(), messageForJoao.getId(), this.messageRepository::findByIdPostAuthorize);
     }
 
     private void attemptAccess(String adminUser,
