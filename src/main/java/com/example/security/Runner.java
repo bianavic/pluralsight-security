@@ -58,6 +58,10 @@ public class Runner implements ApplicationRunner {
 
         log.info("maria: " + maria.toString());
         log.info("joao: " + joao.toString());
+
+        attemptAccess(maria.getCpf(), joao.getCpf(), messageForJoao.getId(), this.messageRepository::findByIdRolesAllowed);
+
+        attemptAccess(maria.getCpf(), joao.getCpf(), messageForJoao.getId(), this.messageRepository::findByIdSecured);
     }
 
     private void attemptAccess(String adminUser,
